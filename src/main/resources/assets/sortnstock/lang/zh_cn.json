@@ -71,8 +71,7 @@
 	"sortnstock.config.hotkeys.comment.sortHotkey": "整理光标所在容器;容器界面打开时同样有效。",
 	"sortnstock.config.hotkeys.name.openConfigGuiHotkey": "打开配置界面",
 	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "打开本模组配置界面。",
-	"sortnstock.message.sort.busy": "SortNStock:已有整理正在进行",
-	"sortnstock.message.sort.unreachable": "SortNStock:没有可以安全整理的物品",
-	"sortnstock.message.litematica.unavailable": "SortNStock:未安装 Litematica",
-	"sortnstock.message.litematica.no_placement": "SortNStock:没有激活的投影"
+
+
+
 }

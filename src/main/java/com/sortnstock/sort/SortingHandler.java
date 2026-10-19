@@ -9,8 +9,6 @@ import net.minecraft.world.item.ItemStack;
 
 import org.lwjgl.glfw.GLFW;
 
-import fi.dy.masa.malilib.util.InfoUtils;
-
 import com.sortnstock.SortNStock;
 import com.sortnstock.config.ConfigToggles;
 import com.sortnstock.config.Configs;
@@ -73,7 +71,7 @@ public final class SortingHandler
         if (SortQueue.isActive())
         {
             // A previous sort is still running; do not stack programs on top of each other.
-            InfoUtils.printActionbarMessage("sortnstock.message.sort.busy");
+            SortNStock.debugLog("sort: a sort is already in progress, ignoring the hotkey");
             return false;
         }
 
@@ -133,14 +131,10 @@ public final class SortingHandler
         if (result.groups().isEmpty())
         {
             // Either nothing needed moving, or the arrangement could not be reached. Both are
-            // non-destructive outcomes, so give audible feedback and change nothing.
+            // non-destructive outcomes, so give audible feedback and change nothing. No action-bar
+            // message: sorting is a hotkey action and the sound already says "nothing to do".
             SortNStock.debugLog("sort: nothing to do ({})", result.reason());
             SortFeedback.playNothingToDo();
-
-            if (result.reason() == SortPlanner.Reason.UNREACHABLE)
-            {
-                InfoUtils.printActionbarMessage("sortnstock.message.sort.unreachable");
-            }
 
             return false;
         }
