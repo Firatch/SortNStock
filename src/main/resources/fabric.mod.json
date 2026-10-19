@@ -9,6 +9,7 @@
 		"SortNStock contributors"
 	],
 	"license": "MIT",
+	"icon": "assets/sortnstock/icon.png",
 
 	"environment": "client",
 	"entrypoints": {

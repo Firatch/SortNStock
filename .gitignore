@@ -23,3 +23,6 @@ remappedSrc/
 
 # Local run output
 logs/
+
+# Scratch space for icon drafts
+icon-candidates/
