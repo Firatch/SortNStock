@@ -7,6 +7,8 @@ These apply to every change in this repository, without the user having to ask a
 After any code change, build **and** install the jar into the test instance in one step:
 
 ```
+$env:JAVA_HOME = 'C:\Program Files\Java\zulu-25'
+$env:SORTNSTOCK_MODS_DIR = '<test-instance>\.minecraft\mods'
 pwsh -File tools\build-and-install.ps1
 ```
 
