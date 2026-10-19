@@ -273,7 +273,7 @@ place.
 The first attempt at a fix — changing the default to `false` — **did not work in practice**, and
 the reason is worth recording: **a persisted config value always overrides a code default.**
 Inspection of the live test instance confirmed this. The installed jar was byte-identical to the
-new build (matching SHA256), yet `<test-instance>\.minecraft\config\sortnstock.json`
+new build (matching SHA256), yet `config\sortnstock.json`
 still contained `"sortKeepEmptySlots": true`, so the old behaviour was retained. MaLiLib's
 `ConfigUtils.readConfigBase` only applies a key when the JSON object actually contains it
 (`if (obj.has(name))`), and `writeConfigBase` builds a fresh object from the registered options.
@@ -770,7 +770,7 @@ still disagrees, the difference is between the planned target and what the click
 ### Shulker-box ordering: confirmed working in game
 
 Verified from the test instance log (`latest.log`, session 13:17–13:18, jar
-`02205F8A01848739` installed 13:16:56 — the timestamps were checked first, per `AGENTS.md`).
+`02205F8A01848739` installed 13:16:56 — the timestamps were checked first,).
 
 The diagnostics separated the three links in the chain, and all three passed:
 

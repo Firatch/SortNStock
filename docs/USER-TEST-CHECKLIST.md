@@ -1,7 +1,7 @@
 # SortNStock — 用户测试清单
 
 **测试构建：** `build/libs/sortnstock-26.1.2-0.1.0.jar`
-（已安装到 `<test-instance>\.minecraft\mods\`）
+（已安装到 `mods\`）
 
 > **以下每一项均为「待用户验证」。** 开发者未进行任何游戏内测试。
 > 已由单元测试覆盖的**纯逻辑**部分见文末「附录 A」，那里不必重复验证；
