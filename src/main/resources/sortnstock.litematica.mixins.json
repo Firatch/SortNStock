@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "com.sortnstock.mixin.litematica",
+	"plugin": "com.sortnstock.mixin.SortNStockLitematicaMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"minVersion": "0.8",
+	"client": [
+		"MixinLitematicaInventoryUtils"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

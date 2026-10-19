@@ -1,0 +1,79 @@
+{
+	"sortnstock.gui.title.configs": "SortNStock 配置",
+	"sortnstock.gui.button.config_gui.sorting": "整理",
+	"sortnstock.gui.button.config_gui.restock": "自动补货",
+	"sortnstock.gui.button.config_gui.quickshulker": "潜影盒联动",
+	"sortnstock.gui.button.config_gui.litematica": "投影联动",
+	"sortnstock.gui.button.config_gui.debug": "调试",
+	"sortnstock.gui.button.config_gui.hotkeys": "快捷键",
+
+	"sortnstock.hotkeys.category.generic": "SortNStock 快捷键",
+	"sortnstock.hotkeys.category.options": "SortNStock 选项开关",
+
+	"sortnstock.config.toggle.on": "开启",
+	"sortnstock.config.toggle.off": "关闭",
+
+	"sortnstock.config.sort.order.ascending": "升序",
+	"sortnstock.config.sort.order.descending": "降序",
+
+	"sortnstock.config.sorting.name.sortEnabled": "启用整理",
+	"sortnstock.config.sorting.comment.sortEnabled": "背包整理模块总开关。",
+	"sortnstock.config.sorting.name.sortKey": "排序键",
+	"sortnstock.config.sorting.comment.sortKey": "排序的主要依据。",
+
+	"sortnstock.config.sort.key.registry_name": "注册名",
+	"sortnstock.config.sort.key.display_name": "显示名",
+	"sortnstock.config.sort.key.count": "数量",
+	"sortnstock.config.sort.key.durability": "耐久",
+	"sortnstock.config.sort.key.nbt": "NBT / 组件",
+	"sortnstock.config.sort.key.tag": "标签",
+
+	"sortnstock.config.restock.name.restockEnabled": "启用自动补货",
+	"sortnstock.config.restock.prettyName.restockEnabled": "启用自动补货",
+	"sortnstock.config.restock.comment.restockEnabled": "自动补货模块总开关。",
+	"sortnstock.config.restock.name.restockMinCount": "最低数量",
+	"sortnstock.config.restock.comment.restockMinCount": "低于此数量即补货,一次补满一组。\n设为 0 表示用光之后才补。",
+	"sortnstock.config.restock.name.restockTargetSlots": "目标槽位",
+	"sortnstock.config.restock.comment.restockTargetSlots": "补货可放入的槽位。",
+
+	"sortnstock.config.restock.name.restockCooldownTicks": "冷却",
+	"sortnstock.config.restock.comment.restockCooldownTicks": "补货后需等待的 tick 数。",
+	"sortnstock.config.restock.name.restockMaxOpsPerTick": "每 tick 最大操作数",
+	"sortnstock.config.restock.comment.restockMaxOpsPerTick": "每 tick 最多发出几次容器操作。",
+	"sortnstock.config.quickshulker.name.quickshulkerRestockFromShulker": "启用从潜影盒补货",
+	"sortnstock.config.quickshulker.prettyName.quickshulkerRestockFromShulker": "从潜影盒补货",
+	"sortnstock.config.quickshulker.comment.quickshulkerRestockFromShulker": "所需物品在携带的潜影盒里时\n自动开盒取用,需已安装。",
+
+	"sortnstock.config.restock.target.hotbar": "快捷栏",
+	"sortnstock.config.restock.target.offhand": "副手",
+	"sortnstock.config.restock.target.both": "快捷栏 + 副手",
+
+
+
+
+
+
+	"sortnstock.config.litematica.name.litematicaAutoRestock": "启用投影联动",
+	"sortnstock.config.litematica.prettyName.litematicaAutoRestock": "启用投影联动",
+	"sortnstock.config.litematica.comment.litematicaAutoRestock": "投影联动总开关;未安装 Litematica 时无效。",
+	"sortnstock.config.litematica.name.litematicaRightClickRestock": "缺料时从潜影盒取用",
+	"sortnstock.config.litematica.comment.litematicaRightClickRestock": "所需方块不在背包时,允许开盒取用。",
+	"sortnstock.config.litematica.name.litematicaLowCountRestock": "数量不足补货",
+	"sortnstock.config.litematica.comment.litematicaLowCountRestock": "主手物品正确但数量不足时,先补货。",
+	"sortnstock.config.litematica.name.litematicaCooldownTicks": "冷却",
+	"sortnstock.config.litematica.comment.litematicaCooldownTicks": "两次联动补货间的等待 tick 数。",
+
+	"sortnstock.config.debug.name.debugLogging": "调试日志",
+	"sortnstock.config.debug.prettyName.debugLogging": "调试日志",
+	"sortnstock.config.debug.comment.debugLogging": "把决策过程记录到游戏日志。",
+
+	"sortnstock.config.hotkeys.name.sortHotkey": "整理容器",
+	"sortnstock.config.hotkeys.comment.sortHotkey": "整理光标所在容器;容器界面打开时同样有效。",
+	"sortnstock.config.hotkeys.name.openConfigGuiHotkey": "打开配置界面",
+	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "打开本模组配置界面。",
+	"sortnstock.message.sort.disabled": "SortNStock:整理功能已关闭",
+	"sortnstock.message.sort.busy": "SortNStock:已有整理正在进行",
+	"sortnstock.message.sort.unreachable": "SortNStock:没有可以安全整理的物品",
+	"sortnstock.message.litematica.unavailable": "SortNStock:未安装 Litematica",
+	"sortnstock.message.litematica.no_placement": "SortNStock:没有激活的投影"
+}

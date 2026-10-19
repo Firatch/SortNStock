@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "com.sortnstock.mixin.quickshulker",
+	"plugin": "com.sortnstock.mixin.SortNStockQuickShulkerMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"minVersion": "0.8",
+	"client": [
+		"MixinQuickShulkerUtil"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

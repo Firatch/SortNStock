@@ -1,0 +1,79 @@
+{
+	"sortnstock.gui.title.configs": "SortNStock Configs",
+	"sortnstock.gui.button.config_gui.sorting": "Sorting",
+	"sortnstock.gui.button.config_gui.restock": "Restock",
+	"sortnstock.gui.button.config_gui.quickshulker": "QuickShulker",
+	"sortnstock.gui.button.config_gui.litematica": "Litematica",
+	"sortnstock.gui.button.config_gui.debug": "Debug",
+	"sortnstock.gui.button.config_gui.hotkeys": "Hotkeys",
+
+	"sortnstock.hotkeys.category.generic": "SortNStock Hotkeys",
+	"sortnstock.hotkeys.category.options": "SortNStock Option Toggles",
+
+	"sortnstock.config.toggle.on": "On",
+	"sortnstock.config.toggle.off": "Off",
+
+	"sortnstock.config.sort.order.ascending": "Ascending",
+	"sortnstock.config.sort.order.descending": "Descending",
+
+	"sortnstock.config.sorting.name.sortEnabled": "Enable Sorting",
+	"sortnstock.config.sorting.comment.sortEnabled": "Master switch for sorting.",
+	"sortnstock.config.sorting.name.sortKey": "Sort Key",
+	"sortnstock.config.sorting.comment.sortKey": "Primary sort key.",
+
+	"sortnstock.config.sort.key.registry_name": "Registry Name",
+	"sortnstock.config.sort.key.display_name": "Display Name",
+	"sortnstock.config.sort.key.count": "Count",
+	"sortnstock.config.sort.key.durability": "Durability",
+	"sortnstock.config.sort.key.nbt": "NBT / Components",
+	"sortnstock.config.sort.key.tag": "Tags",
+
+	"sortnstock.config.restock.name.restockEnabled": "Enable Restocking",
+	"sortnstock.config.restock.prettyName.restockEnabled": "Automatic Restocking",
+	"sortnstock.config.restock.comment.restockEnabled": "Master switch for restocking.",
+	"sortnstock.config.restock.name.restockMinCount": "Minimum Count",
+	"sortnstock.config.restock.comment.restockMinCount": "Restock at or below this, filling a full stack.\n0 = top up only once the slot is empty.",
+	"sortnstock.config.restock.name.restockTargetSlots": "Target Slots",
+	"sortnstock.config.restock.comment.restockTargetSlots": "Slots that may receive restocked items.",
+
+	"sortnstock.config.restock.name.restockCooldownTicks": "Cooldown",
+	"sortnstock.config.restock.comment.restockCooldownTicks": "Ticks to wait after a restock.",
+	"sortnstock.config.restock.name.restockMaxOpsPerTick": "Max Operations Per Tick",
+	"sortnstock.config.restock.comment.restockMaxOpsPerTick": "Max container operations per tick.",
+	"sortnstock.config.quickshulker.name.quickshulkerRestockFromShulker": "Restock From Shulker Boxes",
+	"sortnstock.config.quickshulker.prettyName.quickshulkerRestockFromShulker": "Restock From Shulker Boxes",
+	"sortnstock.config.quickshulker.comment.quickshulkerRestockFromShulker": "Take items from a carried box\nwhen it holds what you need.\nRequires QuickShulker.",
+
+	"sortnstock.config.restock.target.hotbar": "Hotbar",
+	"sortnstock.config.restock.target.offhand": "Offhand",
+	"sortnstock.config.restock.target.both": "Hotbar + Offhand",
+
+
+
+
+
+
+	"sortnstock.config.litematica.name.litematicaAutoRestock": "Enable Litematica Integration",
+	"sortnstock.config.litematica.prettyName.litematicaAutoRestock": "Litematica Integration",
+	"sortnstock.config.litematica.comment.litematicaAutoRestock": "Master switch; does nothing without Litematica.",
+	"sortnstock.config.litematica.name.litematicaRightClickRestock": "Use Shulker Boxes When Missing",
+	"sortnstock.config.litematica.comment.litematicaRightClickRestock": "Open a carried box when the block\nis not in the inventory.",
+	"sortnstock.config.litematica.name.litematicaLowCountRestock": "Restock When Count Is Low",
+	"sortnstock.config.litematica.comment.litematicaLowCountRestock": "Restock before Pick Block if the count is low.",
+	"sortnstock.config.litematica.name.litematicaCooldownTicks": "Cooldown",
+	"sortnstock.config.litematica.comment.litematicaCooldownTicks": "Ticks between integration restocks.",
+
+	"sortnstock.config.debug.name.debugLogging": "Debug Logging",
+	"sortnstock.config.debug.prettyName.debugLogging": "Debug Logging",
+	"sortnstock.config.debug.comment.debugLogging": "Log decisions to the game log.",
+
+	"sortnstock.config.hotkeys.name.sortHotkey": "Sort Container",
+	"sortnstock.config.hotkeys.comment.sortHotkey": "Sort the container under the cursor;\nworks with a container screen open.",
+	"sortnstock.config.hotkeys.name.openConfigGuiHotkey": "Open Config GUI",
+	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "Open the SortNStock config screen.",
+	"sortnstock.message.sort.disabled": "SortNStock: sorting is disabled",
+	"sortnstock.message.sort.busy": "SortNStock: a sort is already in progress",
+	"sortnstock.message.sort.unreachable": "SortNStock: nothing could be sorted safely",
+	"sortnstock.message.litematica.unavailable": "SortNStock: Litematica is not installed",
+	"sortnstock.message.litematica.no_placement": "SortNStock: no active schematic placement"
+}

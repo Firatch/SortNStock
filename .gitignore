@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.eclipse/
+bin/
+
+# Recon clones of dependency sources (not part of the mod)
+_recon/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Loom / run dirs
+run/
+remappedSrc/
+
+# Local run output
+logs/

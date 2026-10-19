@@ -1,0 +1,48 @@
+{
+	"schemaVersion": 1,
+	"id": "sortnstock",
+	"name": "SortNStock",
+	"version": "${version}",
+
+	"description": "Client-side inventory sorting and automatic restocking, with optional Litematica schematic and QuickShulker integration. Moves only items you already own; never spawns or duplicates items.",
+	"authors": [
+		"SortNStock contributors"
+	],
+	"license": "MIT",
+
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"com.sortnstock.SortNStock"
+		],
+		"modmenu": [
+			"com.sortnstock.compat.modmenu.ModMenuImpl"
+		]
+	},
+	"mixins": [
+		{
+			"config": "sortnstock.mixins.json",
+			"environment": "client"
+		},
+		{
+			"config": "sortnstock.litematica.mixins.json",
+			"environment": "client"
+		},
+		{
+			"config": "sortnstock.quickshulker.mixins.json",
+			"environment": "client"
+		}
+	],
+
+	"depends": {
+		"minecraft": "~26.1",
+		"fabricloader": ">=0.19.3",
+		"java": ">=25",
+		"fabric-api": "*",
+		"malilib": ">=0.28.11- <0.29.0-"
+	},
+	"recommends": {
+		"litematica": ">=0.27.11- <0.28.0-",
+		"quickshulker": "*"
+	}
+}

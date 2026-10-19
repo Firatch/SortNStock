@@ -1,0 +1,140 @@
+plugins {
+	// Minecraft 26.1+ is unobfuscated, so the standard (non-remapping) Loom plugin is
+	// used and `mappings` is intentionally NOT declared. See:
+	// https://fabricmc.net/2026/03/14/261.html
+	id 'net.fabricmc.fabric-loom' version '1.17.21'
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	// MaLiLib + Litematica (fi.dy.masa.*) — sakura-ryoko's maven
+	maven {
+		name = 'masa'
+		url = 'https://masa.dy.fi/maven/sakura-ryoko'
+		content { includeGroupAndSubgroups('fi.dy.masa') }
+	}
+	// QuickShulker (net.kyrptonaught.*) — MoRanpcy's maven
+	maven {
+		name = 'moranpcy'
+		url = 'https://maven.moranpcy.com/releases'
+		content { includeGroupAndSubgroups('net.kyrptonaught') }
+	}
+	maven {
+		name = 'terraformers'
+		url = 'https://maven.terraformersmc.com/releases/'
+		content { includeGroupAndSubgroups('com.terraformersmc') }
+	}
+	maven {
+		name = 'fallenbreath'
+		url = 'https://maven.fallenbreath.me/releases'
+		content { includeGroupAndSubgroups('me.fallenbreath') }
+	}
+	mavenCentral()
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// --- Hard dependency: MaLiLib ------------------------------------------
+	// Provides the config system, config GUI, hotkey system and the inventory
+	// utility primitives that SortNStock is built on. Not bundled; the user
+	// installs it separately (declared as a `depends` in fabric.mod.json).
+	implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
+
+	// --- Soft dependency: Litematica ---------------------------------------
+	// compileOnly + runtimeOnly (not `implementation`): we compile against it
+	// and want it present in the dev runtime, but we must not force it on
+	// downstream consumers. The mixin that targets it is conditionally applied.
+	compileOnly "fi.dy.masa.litematica:litematica-fabric-${project.minecraft_version}:${project.litematica_version}"
+	runtimeOnly "fi.dy.masa.litematica:litematica-fabric-${project.minecraft_version}:${project.litematica_version}"
+
+	// --- Soft dependency: QuickShulker -------------------------------------
+	// Only used for *opening* a carried shulker box so that its contents can be
+	// moved out through normal, server-validated container clicks. All shulker
+	// *reads* go through vanilla data components, so QuickShulker is optional.
+	compileOnly "net.kyrptonaught:quickshulker:${project.quickshulker_version}"
+	runtimeOnly("net.kyrptonaught:quickshulker:${project.quickshulker_version}") {
+		// Keep the dev runtime deterministic: do not let QuickShulker's own
+		// runtime pins (older fabric-api, modmenu, loader) leak into our graph.
+		exclude group: 'net.fabricmc'
+		exclude group: 'net.fabricmc.fabric-api'
+		exclude group: 'com.terraformersmc'
+	}
+
+	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+
+	// --- Soft dependency: Mod Menu -----------------------------------------
+	// compileOnly on purpose. Mod Menu is the only thing that asks Fabric Loader for the
+	// "modmenu" entry point, so when it is not installed our implementation class is simply
+	// never loaded and no runtime dependency exists. This provides the per-mod config button
+	// in the Mod Menu list; without it the config screen is only reachable through the
+	// openConfigGuiHotkey or MaLiLib's own config screen.
+	compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	// --- Unit tests --------------------------------------------------------
+	// Pure logic tests for the sorting/restocking algorithms. These are the ones
+	// that catch the "loop forever", "wrong slot", "wrong target" class of bugs
+	// without needing the game to be launched.
+	testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	testLogging {
+		events 'passed', 'failed', 'skipped'
+		exceptionFormat = 'full'
+	}
+}
+
+loom {
+	runs {
+		client {
+			// SortNStock is client-only.
+		}
+	}
+}
+
+processResources {
+	inputs.property 'version', project.version
+	inputs.property 'minecraft_version', project.minecraft_version
+	inputs.property 'loader_version', project.loader_version
+	inputs.property 'malilib_version', project.malilib_version
+
+	filesMatching('fabric.mod.json') {
+		expand(
+				'version': inputs.properties.version,
+				'minecraft_version': inputs.properties.minecraft_version,
+				'loader_version': inputs.properties.loader_version,
+				'malilib_version': inputs.properties.malilib_version
+		)
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = 'UTF-8'
+	// Minecraft 26.1+ targets Java 25.
+	it.options.release = 25
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+	withSourcesJar()
+}
+
+jar {
+	from('LICENSE') {
+		rename { "${it}_${project.base.archivesName.get()}" }
+	}
+}

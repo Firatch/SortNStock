@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.sortnstock.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"minVersion": "0.8",
+	"client": [
+		"IMixinAbstractContainerScreen",
+		"MixinClientPacketListener",
+		"MixinMinecraftSetScreen"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
