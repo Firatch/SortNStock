@@ -71,7 +71,6 @@
 	"sortnstock.config.hotkeys.comment.sortHotkey": "Sort the container under the cursor;\nworks with a container screen open.",
 	"sortnstock.config.hotkeys.name.openConfigGuiHotkey": "Open Config GUI",
 	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "Open the SortNStock config screen.",
-	"sortnstock.message.sort.disabled": "SortNStock: sorting is disabled",
 	"sortnstock.message.sort.busy": "SortNStock: a sort is already in progress",
 	"sortnstock.message.sort.unreachable": "SortNStock: nothing could be sorted safely",
 	"sortnstock.message.litematica.unavailable": "SortNStock: Litematica is not installed",

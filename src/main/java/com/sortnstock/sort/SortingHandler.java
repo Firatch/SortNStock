@@ -41,7 +41,9 @@ public final class SortingHandler
     {
         if (ConfigToggles.isOn(Configs.Sorting.SORT_ENABLED) == false)
         {
-            InfoUtils.printActionbarMessage("sortnstock.message.sort.disabled");
+            // Silent: an action-bar message for "the module is switched off" was reported as noise.
+            // The reason is still traceable in the log, which is where a diagnostic belongs.
+            SortNStock.debugLog("sort: sorting is disabled in the config, ignoring the hotkey");
             return false;
         }
 
