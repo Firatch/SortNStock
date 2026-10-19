@@ -63,18 +63,6 @@ The mod jar is written to `build/libs/sortnstock-26.1.2-<version>.jar`.
 Install it alongside MaLiLib in your `mods/` folder; add Litematica and/or QuickShulker if you
 want those integrations.
 
-### Building and installing into the test instance
-
-```
-pwsh -File tools\build-and-install.ps1
-```
-
-This builds, refuses to install if the build or any test failed, copies the jar into
-`<test-instance>\.minecraft\mods\`, and prints the jar hash and timestamp. It also
-warns if Minecraft is currently running — **a jar replaced while the game is running is not
-loaded**, so the game has to be restarted for a new build to take effect. This is the only
-supported way to install a build; see `AGENTS.md` for the standing rules.
-
 ### Notes for this machine
 
 The JDK trust store on the development machine did not validate the public TLS chain used by the
