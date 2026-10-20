@@ -167,7 +167,7 @@ public final class RestockManager
         //
         // The tracked state still has to follow the count, or closing the screen would present the
         // whole difference as one consumption on the next tick.
-        if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen)
+        if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen)
         {
             TRIGGER.update(selectedSlot,
                     mainHand.isEmpty() ? null : mainHand.getItem(),
@@ -373,7 +373,7 @@ public final class RestockManager
     /**
      * True while a shulker box opened by this mod should not be shown on screen.
      *
-     * <p>Read by {@code MixinMinecraftSetScreen}, which cancels {@code Minecraft#setScreen} for the
+     * <p>Read by {@code MixinGuiSetScreen}, which cancels {@code Minecraft#setScreen} for the
      * shulker box's screen. The menu still opens, so the move works; the player just keeps seeing the
      * world instead of a container GUI popping up mid-build. Boxes the player opens themselves are
      * unaffected.</p>

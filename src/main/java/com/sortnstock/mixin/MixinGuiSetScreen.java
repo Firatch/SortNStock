@@ -1,6 +1,6 @@
 package com.sortnstock.mixin;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
 
@@ -25,9 +25,14 @@ import com.sortnstock.restock.RestockManager;
  *
  * <p>Boxes the player opens themselves are untouched: the guard is false unless this mod opened the
  * box and has not finished with it.</p>
+ *
+ * <p><b>Targeted at {@code Gui#setScreen}, not {@code Minecraft}.</b> In Minecraft 26.3 the open
+ * screen moved from {@code Minecraft.screen} to {@code Gui}, and {@code Minecraft.setScreen} was
+ * renamed to {@code setScreenAndShow}, which merely forwards to {@code Gui#setScreen}. Hooking the
+ * {@code Gui} method catches every path that can install a screen.</p>
  */
-@Mixin(Minecraft.class)
-public class MixinMinecraftSetScreen
+@Mixin(Gui.class)
+public class MixinGuiSetScreen
 {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void sortnstock$hideTransientShulkerScreen(Screen screen, CallbackInfo ci)

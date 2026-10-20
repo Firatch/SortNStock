@@ -7,8 +7,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.sortnstock.SortNStock;
 import com.sortnstock.config.ConfigToggles;
 import com.sortnstock.config.Configs;
@@ -24,7 +22,7 @@ public final class SortingHandler
      * How MaLiLib encodes a mouse button in a keybind: {@code InputConstants} value minus 100 (see
      * {@code KeybindMulti}). The middle mouse button is GLFW button 2, so this is -98.
      */
-    private static final int MIDDLE_MOUSE_KEY_CODE = GLFW.GLFW_MOUSE_BUTTON_MIDDLE - 100;
+    private static final int MIDDLE_MOUSE_KEY_CODE = -98;
 
     private SortingHandler()
     {
@@ -47,17 +45,17 @@ public final class SortingHandler
 
         final Minecraft mc = Minecraft.getInstance();
 
-        if (mc.player == null || mc.screen == null)
+        if (mc.player == null || mc.gui.screen() == null)
         {
             return false;
         }
 
-        if ((mc.screen instanceof AbstractContainerScreen<?>) == false)
+        if ((mc.gui.screen() instanceof AbstractContainerScreen<?>) == false)
         {
             return false;
         }
 
-        final AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) mc.screen;
+        final AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) mc.gui.screen();
         final Slot hovered = getHoveredSlot(screen);
 
         if (hovered == null)
