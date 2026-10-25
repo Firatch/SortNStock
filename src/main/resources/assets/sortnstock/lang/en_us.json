@@ -70,7 +70,7 @@
 	"sortnstock.config.hotkeys.name.sortHotkey": "Sort Container",
 	"sortnstock.config.hotkeys.comment.sortHotkey": "Sort the container under the cursor;\nworks with a container screen open.",
 	"sortnstock.config.hotkeys.name.openConfigGuiHotkey": "Open Config GUI",
-	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "Open the SortNStock config screen.",
+	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "Open the SortNStock config screen."
 
 
 

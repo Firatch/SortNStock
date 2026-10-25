@@ -70,7 +70,7 @@
 	"sortnstock.config.hotkeys.name.sortHotkey": "整理容器",
 	"sortnstock.config.hotkeys.comment.sortHotkey": "整理光标所在容器;容器界面打开时同样有效。",
 	"sortnstock.config.hotkeys.name.openConfigGuiHotkey": "打开配置界面",
-	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "打开本模组配置界面。",
+	"sortnstock.config.hotkeys.comment.openConfigGuiHotkey": "打开本模组配置界面。"
 
 
 
