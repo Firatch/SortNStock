@@ -604,16 +604,18 @@ public final class RestockManager
                 // slot: for the Litematica path the targets are its own pickBlockableSlots, and the
                 // pick block only ever looks inside those. Swapping into a slot outside that set left
                 // the item somewhere Litematica would not use.
+                //
+                // The slot emptied into the box is the one holding the smallest stack, so the stack the
+                // player is least likely to miss is the one temporarily stored.
                 if (menu instanceof ShulkerBoxMenu && targets.isEmpty() == false)
                 {
                     int selectedSlot = SlotLookup.findMenuSlot(
                             menu, player.getInventory(),
                             player.getInventory().getSelectedSlot());
 
-                    // Prefer the slot the player is actually holding, when Litematica allows it.
-                    int swapSlot = targets.contains(selectedSlot) ? selectedSlot : targets.get(0);
+                    int swapSlot = chooseSwapSlot(menu, targets, sourceSlotId, selectedSlot);
 
-                    boolean sourceIsBoxSlot = swapSlot != sourceSlotId &&
+                    boolean sourceIsBoxSlot = swapSlot >= 0 &&
                             menu.slots.get(sourceSlotId).container != player.getInventory();
 
                     if (sourceIsBoxSlot)
@@ -748,6 +750,60 @@ public final class RestockManager
                 groups.size(), wanted.size(), immediate);
 
         return true;
+    }
+
+    /**
+     * Picks which target slot to empty into the shulker box when the inventory is full.
+     *
+     * <p>The slot holding the <b>smallest stack</b> is chosen, because that is the one the player is
+     * least likely to miss while the box holds it: the displaced stack sits in the box until the
+     * player takes it back, so losing the largest stack would hurt most. A tie is broken in favour of
+     * the slot the player is currently holding, then by list order.</p>
+     *
+     * <p>Deliberately picks only from {@code targets}: for the Litematica path those are its
+     * {@code pickBlockableSlots}, which is the only place the pick block will look.</p>
+     *
+     * @return the menu slot id to swap with, or -1 when none is usable
+     */
+    private static int chooseSwapSlot(AbstractContainerMenu menu, List<Integer> targets,
+                                      int sourceSlotId, int selectedSlot)
+    {
+        int bestSlot = -1;
+        int bestCount = Integer.MAX_VALUE;
+
+        for (int slot : targets)
+        {
+            if (slot == sourceSlotId)
+            {
+                continue;
+            }
+
+            ItemStack stack = menu.slots.get(slot).getItem();
+
+            if (stack.isEmpty())
+            {
+                continue;
+            }
+
+            if (stack.getCount() < bestCount)
+            {
+                bestCount = stack.getCount();
+                bestSlot = slot;
+            }
+        }
+
+        // Prefer the held slot when it ties for the smallest stack.
+        if (bestSlot >= 0 && selectedSlot != bestSlot && targets.contains(selectedSlot))
+        {
+            ItemStack selected = menu.slots.get(selectedSlot).getItem();
+
+            if (selected.isEmpty() == false && selected.getCount() == bestCount)
+            {
+                return selectedSlot;
+            }
+        }
+
+        return bestSlot;
     }
 
     /** Target slots (hotbar and/or offhand) as menu slot ids. */
