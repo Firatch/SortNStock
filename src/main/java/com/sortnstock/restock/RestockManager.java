@@ -271,7 +271,7 @@ public final class RestockManager
                 ? -1
                 : SlotLookup.findMenuSlot(mc.player.containerMenu, mc.player.getInventory(), pendingOrigin);
 
-        if (planAndQueue(mc, null, pendingItem, originMenuSlot))
+        if (planAndQueue(mc, null, pendingItem, originMenuSlot, pendingTargets))
         {
             SortNStock.debugLog("restock: completed the pending refill for {}", pendingItem);
             finishPending(mc, true);
@@ -373,6 +373,7 @@ public final class RestockManager
         pendingTicksLeft = 0;
         pendingOpenedBox = false;
         pendingOpenAttempts = 0;
+        pendingTargets = null;
         openedMenuId = -1;
     }
 
@@ -438,6 +439,20 @@ public final class RestockManager
     }
 
     /**
+     * Queued restock that keeps an explicit target slot list, used by the retry after a shulker box
+     * opened for the Litematica integration.
+     *
+     * <p>Without the explicit list the retry fell back to the configured targets, so a refill that had
+     * to open a box could land in a hotbar slot outside Litematica's {@code pickBlockableSlots} — the
+     * item was restocked, but the pick block never looked there.</p>
+     */
+    private static boolean planAndQueue(Minecraft mc, ItemStack required, Item justConsumed,
+                                        int preferredDestination, List<Integer> explicitTargets)
+    {
+        return plan(mc, required, justConsumed, preferredDestination, false, 0, explicitTargets);
+    }
+
+    /**
      * Synchronous restock used by the Litematica integration.
      *
      * <p>The clicks are dispatched immediately, inside the current tick and before Litematica's
@@ -486,6 +501,13 @@ public final class RestockManager
     }
 
     private static int lastExecutedGroups;
+
+    /**
+     * The slot ids a pending refill may target, when its caller restricted them (the Litematica
+     * integration passes its pickBlockableSlots). Carried across the ticks the box takes to open, so
+     * the retry does not fall back to the wider configured target set.
+     */
+    private static java.util.List<Integer> pendingTargets;
 
     private static boolean plan(Minecraft mc, ItemStack required, Item justConsumed, int preferredDestination,
                                 boolean immediate, int maxImmediateGroups, List<Integer> explicitTargets)
@@ -716,6 +738,14 @@ public final class RestockManager
                             pendingOrigin = player.getInventory().getSelectedSlot();
                             pendingTicksLeft = PENDING_TIMEOUT_TICKS;
                             pendingOpenAttempts = 0;
+
+                            // Remember WHICH slots the caller may use. Without this the retry fell back
+                            // to the configured target slots, so a refill requested by Litematica could
+                            // land in a hotbar slot outside its pickBlockableSlots: the item was
+                            // restocked, but the pick block never looked at that slot.
+                            pendingTargets = (explicitTargets == null || explicitTargets.isEmpty())
+                                    ? null
+                                    : new java.util.ArrayList<>(explicitTargets);
                         }
 
                         // Stop hammering the server once the box clearly refuses to cooperate; the
