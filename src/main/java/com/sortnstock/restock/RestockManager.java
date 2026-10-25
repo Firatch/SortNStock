@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -577,6 +578,37 @@ public final class RestockManager
 
             if (destination < 0)
             {
+                // No target slot can take the stack: every pick-blockable slot is occupied by
+                // something else. Rather than giving up, swap the held item with the stack inside the
+                // open shulker box — the player ends up holding what they needed and the box keeps
+                // what they were holding. Nothing is created or destroyed, and the container keeps
+                // the same number of items.
+                //
+                // Only possible while a shulker box is open, and only for a slot that belongs to the
+                // box; swapping against the player's own inventory would just shuffle the backpack.
+                if (menu instanceof ShulkerBoxMenu)
+                {
+                    int handSlot = SlotLookup.findMenuSlot(
+                            menu, player.getInventory(),
+                            player.getInventory().getSelectedSlot());
+
+                    boolean sourceIsBoxSlot = handSlot >= 0 &&
+                            handSlot != sourceSlotId &&
+                            menu.slots.get(sourceSlotId).container != player.getInventory();
+
+                    if (sourceIsBoxSlot)
+                    {
+                        // pickup(box), pickup(hand), pickup(box): cursor carries the wanted stack,
+                        // swaps it with the held item, then drops the displaced stack into the box.
+                        groups.add(new int[] { sourceSlotId, handSlot, sourceSlotId });
+                        simulated.put(source.getItem(), have + source.getCount());
+
+                        SortNStock.debugLog(
+                                "restock: inventory full, swapping held item for '{}' from the box",
+                                source.getItem());
+                    }
+                }
+
                 continue;
             }
 
