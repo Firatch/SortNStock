@@ -81,6 +81,11 @@ public final class RestockManager
     private static int silenceTicksLeft;
 
     private static final int SILENCE_AFTER_CLOSE_TICKS = 6;
+
+    /** How many times the open request may be re-issued for the same pending item. */
+    private static final int MAX_OPEN_ATTEMPTS = 4;
+
+    private static int pendingOpenAttempts;
     private static int closeGraceTicks;
     private static int closeMenuId = -1;
 
@@ -368,6 +373,7 @@ public final class RestockManager
         pendingOrigin = -1;
         pendingTicksLeft = 0;
         pendingOpenedBox = false;
+        pendingOpenAttempts = 0;
         openedMenuId = -1;
     }
 
@@ -381,7 +387,7 @@ public final class RestockManager
      */
     public static boolean shouldHideOpenedShulkerScreen()
     {
-        return pendingOpenedBox || closeAfterSync;
+        return (pendingOpenedBox && pendingTicksLeft > 0) || closeAfterSync;
     }
 
     /** Whether QuickShulker's box sounds should be silenced right now. */
@@ -662,12 +668,31 @@ public final class RestockManager
                     {
                         // Establish the pending refill here rather than in the caller. Both callers
                         // need it: the consumption trigger and the Litematica hook. Without it the
-                        // box opened and nobody completed the move or closed it — the reported
-                        // "right-click opens the box but the items cannot be taken out and the box
-                        // cannot be closed".
-                        pendingItem = item;
-                        pendingOrigin = player.getInventory().getSelectedSlot();
-                        pendingTicksLeft = PENDING_TIMEOUT_TICKS;
+                        // box opened and nobody completed the move or closed it.
+                        //
+                        // The timeout is only started for a NEW cycle. Resetting it on every request
+                        // (including the retries) meant a box that never completed kept the pending
+                        // state — and with it the GUI suppression — alive forever, so even opening a
+                        // shulker box by hand showed nothing.
+                        if (pendingItem == null || pendingItem.equals(item) == false)
+                        {
+                            pendingItem = item;
+                            pendingOrigin = player.getInventory().getSelectedSlot();
+                            pendingTicksLeft = PENDING_TIMEOUT_TICKS;
+                            pendingOpenAttempts = 0;
+                        }
+
+                        // Stop hammering the server once the box clearly refuses to cooperate; the
+                        // timeout above then expires and the state is released.
+                        if (pendingOpenAttempts >= MAX_OPEN_ATTEMPTS)
+                        {
+                            SortNStock.debugLog(
+                                    "restock: giving up on opening a box for '{}' after {} attempt(s)",
+                                    item, pendingOpenAttempts);
+                            return false;
+                        }
+
+                        pendingOpenAttempts++;
                         pendingOpenedBox = true;
                         openedMenuId = -1;
                         openSyncBaseline = ContainerSync.version();
