@@ -470,7 +470,26 @@ public final class RestockManager
         lastExecutedGroups = 0;
         plan(mc, required, null, -1, true, Math.max(1, maxGroups), explicitTargets);
 
+        // A successful immediate restock is done with the box: release the pending state and schedule
+        // the close. Leaving it set kept the box open, made every following click request the box
+        // again, and kept the shulker screen suppressed.
+        if (lastExecutedGroups > 0 && pendingOpenedBox)
+        {
+            finishPending(mc, true);
+        }
+
         return lastExecutedGroups;
+    }
+
+    /**
+     * Whether a refill is waiting for a shulker box to open.
+     *
+     * <p>Exposed so Litematica's easy place can stand down for the duration: the items cannot be in
+     * hand until the server answers, so placing anything in that window would place the wrong block.</p>
+     */
+    public static boolean isWaitingForShulkerBox()
+    {
+        return pendingOpenedBox && pendingTicksLeft > 0;
     }
 
     private static int lastExecutedGroups;
