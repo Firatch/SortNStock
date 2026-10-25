@@ -145,6 +145,17 @@ public final class RestockManager
                 RestockQueue.cancel();
             }
 
+            // The Litematica integration has its own switch and is NOT gated by this one, so it can
+            // still request a shulker box and create the pending-refill state. That state has to be
+            // resolved here too, otherwise it lives forever: the shulker-screen suppression it
+            // implies then never ends, and even opening a box by hand shows no GUI.
+            if (pendingItem != null || pendingOpenedBox || closeAfterSync)
+            {
+                finishPending(mc, pendingOpenedBox);
+            }
+
+            tickDeferredClose(mc);
+
             return;
         }
 
