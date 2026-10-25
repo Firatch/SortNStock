@@ -817,49 +817,25 @@ public final class RestockManager
     private static int chooseSwapSlot(AbstractContainerMenu menu, List<Integer> targets,
                                       int sourceSlotId, int selectedSlot)
     {
-        int bestSlot = -1;
-        int bestCount = Integer.MAX_VALUE;
+        final int[] slots = new int[targets.size()];
+        final int[] counts = new int[targets.size()];
+        final boolean[] empty = new boolean[targets.size()];
+        final boolean[] shulkerBox = new boolean[targets.size()];
 
-        for (int slot : targets)
+        for (int i = 0; i < slots.length; i++)
         {
-            if (slot == sourceSlotId)
-            {
-                continue;
-            }
+            slots[i] = targets.get(i);
+            ItemStack stack = menu.slots.get(slots[i]).getItem();
 
-            ItemStack stack = menu.slots.get(slot).getItem();
-
-            if (stack.isEmpty())
-            {
-                continue;
-            }
-
+            empty[i] = stack.isEmpty();
+            counts[i] = stack.isEmpty() ? 0 : stack.getCount();
             // Never stuff a shulker box into another box: it is legal, but its own contents would then
             // need two boxes opened to reach.
-            if (stack.is(net.minecraft.tags.ItemTags.SHULKER_BOXES))
-            {
-                continue;
-            }
-
-            if (stack.getCount() < bestCount)
-            {
-                bestCount = stack.getCount();
-                bestSlot = slot;
-            }
+            shulkerBox[i] = stack.isEmpty() == false &&
+                    stack.is(net.minecraft.tags.ItemTags.SHULKER_BOXES);
         }
 
-        // Prefer the held slot when it ties for the smallest stack.
-        if (bestSlot >= 0 && selectedSlot != bestSlot && targets.contains(selectedSlot))
-        {
-            ItemStack selected = menu.slots.get(selectedSlot).getItem();
-
-            if (selected.isEmpty() == false && selected.getCount() == bestCount)
-            {
-                return selectedSlot;
-            }
-        }
-
-        return bestSlot;
+        return SwapTargetRules.choose(slots, counts, empty, shulkerBox, sourceSlotId, selectedSlot);
     }
 
     /** Target slots (hotbar and/or offhand) as menu slot ids. */
