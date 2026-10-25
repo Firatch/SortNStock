@@ -595,34 +595,38 @@ public final class RestockManager
 
             if (destination < 0)
             {
-                // No target slot can take the stack: every pick-blockable slot is occupied by
-                // something else. Rather than giving up, swap the held item with the stack inside the
-                // open shulker box — the player ends up holding what they needed and the box keeps
-                // what they were holding. Nothing is created or destroyed, and the container keeps
-                // the same number of items.
+                // No target slot can take the stack: every slot that may receive a refill is occupied
+                // by something else. Rather than giving up, swap with the open shulker box — the
+                // player ends up holding what they needed and the box keeps the displaced stack.
+                // Nothing is created or destroyed.
                 //
-                // Only possible while a shulker box is open, and only for a slot that belongs to the
-                // box; swapping against the player's own inventory would just shuffle the backpack.
-                if (menu instanceof ShulkerBoxMenu)
+                // The swap slot has to be one of the *target* slots, not simply the selected hotbar
+                // slot: for the Litematica path the targets are its own pickBlockableSlots, and the
+                // pick block only ever looks inside those. Swapping into a slot outside that set left
+                // the item somewhere Litematica would not use.
+                if (menu instanceof ShulkerBoxMenu && targets.isEmpty() == false)
                 {
-                    int handSlot = SlotLookup.findMenuSlot(
+                    int selectedSlot = SlotLookup.findMenuSlot(
                             menu, player.getInventory(),
                             player.getInventory().getSelectedSlot());
 
-                    boolean sourceIsBoxSlot = handSlot >= 0 &&
-                            handSlot != sourceSlotId &&
+                    // Prefer the slot the player is actually holding, when Litematica allows it.
+                    int swapSlot = targets.contains(selectedSlot) ? selectedSlot : targets.get(0);
+
+                    boolean sourceIsBoxSlot = swapSlot != sourceSlotId &&
                             menu.slots.get(sourceSlotId).container != player.getInventory();
 
                     if (sourceIsBoxSlot)
                     {
-                        // pickup(box), pickup(hand), pickup(box): cursor carries the wanted stack,
-                        // swaps it with the held item, then drops the displaced stack into the box.
-                        groups.add(new int[] { sourceSlotId, handSlot, sourceSlotId });
+                        // pickup(box), pickup(target), pickup(box): cursor carries the wanted stack,
+                        // swaps it with the slot's contents, then drops the displaced stack into the
+                        // box.
+                        groups.add(new int[] { sourceSlotId, swapSlot, sourceSlotId });
                         simulated.put(source.getItem(), have + source.getCount());
 
                         SortNStock.debugLog(
-                                "restock: inventory full, swapping held item for '{}' from the box",
-                                source.getItem());
+                                "restock: inventory full, swapping slot {} for '{}' from the box",
+                                swapSlot, source.getItem());
                     }
                 }
 
