@@ -138,28 +138,10 @@ public final class RestockManager
             silenceTicksLeft--;
         }
 
-        if (Configs.Restock.RESTOCK_ENABLED.getBooleanValue() == false)
-        {
-            if (RestockQueue.isActive())
-            {
-                RestockQueue.cancel();
-            }
-
-            // The Litematica integration has its own switch and is NOT gated by this one, so it can
-            // still request a shulker box and create the pending-refill state. That state has to be
-            // resolved here too, otherwise it lives forever: the shulker-screen suppression it
-            // implies then never ends, and even opening a box by hand shows no GUI.
-            if (pendingItem != null || pendingOpenedBox || closeAfterSync)
-            {
-                finishPending(mc, pendingOpenedBox);
-            }
-
-            tickDeferredClose(mc);
-
-            return;
-        }
-
-        // Keep the queue draining regardless of whether a trigger fires this tick.
+        // The restocking machinery always runs. The Litematica integration has its own switch and is
+        // not gated by the auto-restock one, and the work it queued still has to be dispatched —
+        // gating this behind restockEnabled left the pending state (and the shulker-screen
+        // suppression) alive forever.
         RestockQueue.tick(mc);
 
         // A refill that had to wait for a shulker box to open is completed here, on the ticks after
@@ -168,6 +150,12 @@ public final class RestockManager
 
         // Closing a box waits for the server to confirm the move it carried.
         tickDeferredClose(mc);
+
+        // Only the consumption trigger is gated by the master switch.
+        if (Configs.Restock.RESTOCK_ENABLED.getBooleanValue() == false)
+        {
+            return;
+        }
 
         // The single, unconditional trigger: the main hand stack shrank. That covers both using
         // or consuming an item (eating, throwing, drinking) and placing a block, and it is the
@@ -462,23 +450,28 @@ public final class RestockManager
      *                        configured hotbar/offhand targets. The Litematica integration
      *                        passes its own pick-blockable hotbar slots here, so SortNStock never
      *                        keeps a second slot list of its own.
-     * @return the number of click groups actually executed
+     * @return whether at least one click group was queued
      */
-    public static int planAndExecuteNow(Minecraft mc, ItemStack required, int maxGroups,
-                                        List<Integer> explicitTargets)
+    public static boolean queueFromLitematicaHook(Minecraft mc, ItemStack required,
+                                                  List<Integer> explicitTargets)
     {
-        lastExecutedGroups = 0;
-        plan(mc, required, null, -1, true, Math.max(1, maxGroups), explicitTargets);
+        // Queue instead of clicking now. Clicking inside Litematica's pick block made it evaluate its
+        // own placement against a container state the server had not accepted yet; the symptom was
+        // that the wrong block was placed first and only the following click used the refilled stack.
+        // The reference implementation of this feature (BetterShulkerHUDMod) never clicks during the
+        // interaction either — it records the request and lets the extraction run on later ticks, once
+        // the server has answered — so the same approach is used here.
+        //
+        // The shared cooldown is not consulted on this path: the Litematica integration enforces its
+        // own. The value is restored afterwards so the consumption trigger keeps its cadence.
+        final int savedCooldown = cooldownTicks;
+        cooldownTicks = 0;
 
-        // A successful immediate restock is done with the box: release the pending state and schedule
-        // the close. Leaving it set kept the box open, made every following click request the box
-        // again, and kept the shulker screen suppressed.
-        if (lastExecutedGroups > 0 && pendingOpenedBox)
-        {
-            finishPending(mc, true);
-        }
+        final boolean planned = plan(mc, required, null, -1, false, 1, explicitTargets);
 
-        return lastExecutedGroups;
+        cooldownTicks = savedCooldown;
+
+        return planned;
     }
 
     /**
@@ -642,7 +635,14 @@ public final class RestockManager
                         // pickup(box), pickup(target), pickup(box): cursor carries the wanted stack,
                         // swaps it with the slot's contents, then drops the displaced stack into the
                         // box.
-                        groups.add(new int[] { sourceSlotId, swapSlot, sourceSlotId });
+                        // Two clicks when the destination is empty (a plain move), three when it holds something (a
+                        // real swap): the third click only exists to return the displaced stack to the
+                        // box, and on an empty slot it would be a no-op that leaves the plan and the
+                        // server disagreeing.
+                        int[] group = menu.slots.get(swapSlot).getItem().isEmpty()
+                                ? new int[] { sourceSlotId, swapSlot }
+                                : new int[] { sourceSlotId, swapSlot, sourceSlotId };
+                        groups.add(group);
                         simulated.put(source.getItem(), have + source.getCount());
 
                         SortNStock.debugLog(
@@ -800,6 +800,13 @@ public final class RestockManager
             ItemStack stack = menu.slots.get(slot).getItem();
 
             if (stack.isEmpty())
+            {
+                continue;
+            }
+
+            // Never stuff a shulker box into another box: it is legal, but its own contents would then
+            // need two boxes opened to reach.
+            if (stack.is(net.minecraft.tags.ItemTags.SHULKER_BOXES))
             {
                 continue;
             }

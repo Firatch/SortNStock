@@ -188,13 +188,13 @@ public final class LitematicaRestockHandler
             return;
         }
 
-        int executed = RestockManager.planAndExecuteNow(mc, requiredStack, MAX_SYNC_GROUPS, targets);
-
-        if (executed > 0)
+        // Queued rather than clicked here: see RestockManager#queueFromLitematicaHook for why
+        // clicking inside the pick block placed the wrong block first.
+        if (RestockManager.queueFromLitematicaHook(mc, requiredStack, targets))
         {
             cooldownTicks = Configs.Litematica.LITEMATICA_COOLDOWN_TICKS.getIntegerValue();
-            SortNStock.debugLog("litematica: restocked for '{}' with {} group(s) before pick block",
-                    requiredStack.getItem(), executed);
+            SortNStock.debugLog("litematica: queued a restock for '{}' before pick block",
+                    requiredStack.getItem());
         }
     }
 }
