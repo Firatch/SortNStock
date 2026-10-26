@@ -14,6 +14,7 @@ import net.minecraft.world.phys.HitResult;
 import com.sortnstock.SortNStock;
 import com.sortnstock.compat.quickshulker.QuickShulkerCompat;
 import com.sortnstock.config.Configs;
+import com.sortnstock.restock.RestockQueue;
 
 /**
  * Restocks from a shulker box when the player picks a block they do not carry.
@@ -64,6 +65,15 @@ public final class PickBlockRestockHandler
         }
 
         if (QuickShulkerCompat.canSend() == false)
+        {
+            return;
+        }
+
+        // A refill is already in flight. Placing a block shrinks the main hand, so this path and the
+        // consumption trigger fire for the same action; without this guard each asked for its own box,
+        // two boxes opened, and the stack count flickered between the client's prediction and the
+        // server's state ("shows 63, actually 64").
+        if (RestockManager.isWaitingForShulkerBox() || RestockQueue.isActive())
         {
             return;
         }
