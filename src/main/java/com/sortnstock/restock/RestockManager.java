@@ -86,6 +86,9 @@ public final class RestockManager
     private static final int MAX_OPEN_ATTEMPTS = 4;
 
     private static int pendingOpenAttempts;
+
+    /** Whether the last plan asked for a box to be opened. Cleared at the start of every plan. */
+    private static boolean lastPlanRequestedBox;
     private static int closeGraceTicks;
     private static int closeMenuId = -1;
 
@@ -192,6 +195,16 @@ public final class RestockManager
 
         SortNStock.debugLog("restock: main hand shrank (consumed {}), checking", consumed);
 
+        // A refill for this item is already in flight — its box is opening, its contents are being
+        // waited for, or its clicks are queued. Starting a second one races the first: two boxes open,
+        // two plans run against menus the server has not caught up with, and the count flickers between
+        // what the client predicted and what the server applied.
+        if (isWaitingForShulkerBox() || RestockQueue.isActive())
+        {
+            SortNStock.debugLog("restock: a refill is already in flight, not starting another");
+            return;
+        }
+
         // The player was placing from the selected hotbar slot, so that is where the refill should
         // go back. Resolved here, while it is still the slot the count came from.
         final int originSlot = SlotLookup.findMenuSlot(
@@ -204,13 +217,19 @@ public final class RestockManager
             // Nothing reachable held the item. It may be inside a carried shulker box; remember the
             // request so it is retried once any box that was asked to open has actually opened.
             //
-            // The origin is remembered as a *hotbar index*, not a menu slot id: opening a shulker box
-            // replaces the open menu, so a menu slot id from this moment points somewhere else by the
-            // time the retry runs. That mismatch is why a refilled stack used to land in the first
-            // hotbar slot instead of the one that had just been used.
-            pendingItem = consumed;
-            pendingOrigin = TRIGGER.originSlot();
-            pendingTicksLeft = PENDING_TIMEOUT_TICKS;
+            // Only when a box was actually requested. Creating the pending state on any other failure
+            // (cooldown, nothing to do) made the trigger start a fresh refill cycle for an event that
+            // needed none, which is how one placed block ended up opening two boxes.
+            if (lastPlanRequestedBox)
+            {
+                // The origin is remembered as a *hotbar index*, not a menu slot id: opening a shulker
+                // box replaces the open menu, so a menu slot id from this moment points somewhere else
+                // by the time the retry runs. That mismatch is why a refilled stack used to land in the
+                // first hotbar slot instead of the one that had just been used.
+                pendingItem = consumed;
+                pendingOrigin = TRIGGER.originSlot();
+                pendingTicksLeft = PENDING_TIMEOUT_TICKS;
+            }
         }
         else
         {
@@ -536,6 +555,8 @@ public final class RestockManager
             return false;
         }
 
+        lastPlanRequestedBox = false;
+
         // The queued path respects the shared cooldown/throttle. The immediate path is driven by
         // the Litematica integration, which enforces its own, separate cooldown.
         if (immediate == false && (cooldownTicks > 0 || RestockQueue.isActive()))
@@ -765,6 +786,17 @@ public final class RestockManager
                                     : new java.util.ArrayList<>(explicitTargets);
                         }
 
+                        // One box at a time. Asking again while a box for the same item is already
+                        // opening opened a second box, which raced the first one's clicks and left the
+                        // client and server disagreeing about the stack size (reported as "shows 63,
+                        // actually 64", with the count flickering).
+                        if (pendingItem != null && pendingItem.equals(item) && pendingOpenAttempts > 0)
+                        {
+                            SortNStock.debugLog(
+                                    "restock: a box for '{}' is already opening, not asking again", item);
+                            return false;
+                        }
+
                         // Stop hammering the server once the box clearly refuses to cooperate; the
                         // timeout above then expires and the state is released.
                         if (pendingOpenAttempts >= MAX_OPEN_ATTEMPTS)
@@ -780,6 +812,7 @@ public final class RestockManager
                         openedMenuId = -1;
                         openSyncBaseline = ContainerSync.version();
                         applyCooldown(OPEN_REQUEST_COOLDOWN_TICKS);
+                        lastPlanRequestedBox = true;
                         return false;
                     }
                 }
