@@ -6,7 +6,8 @@
 	"client": [
 		"IMixinAbstractContainerScreen",
 		"MixinClientPacketListener",
-		"MixinMinecraftSetScreen"
+		"MixinMinecraftSetScreen",
+		"MixinMinecraftPickBlock"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -439,6 +439,23 @@ public final class RestockManager
     }
 
     /**
+     * Asks the shulker boxes for an item the player does not carry, on behalf of vanilla pick block.
+     *
+     * <p>Queued rather than clicked: the box still has to be opened and its contents synced, exactly
+     * like the Litematica path. The caller has already established that the item is nowhere in the
+     * inventory, so any stack that turns up can only come from a box.</p>
+     */
+    public static void requestFromShulker(Minecraft mc, Item item)
+    {
+        if (item == Items.AIR)
+        {
+            return;
+        }
+
+        planAndQueue(mc, new ItemStack(item), null, -1);
+    }
+
+    /**
      * Queued restock that keeps an explicit target slot list, used by the retry after a shulker box
      * opened for the Litematica integration.
      *
